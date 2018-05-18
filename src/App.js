@@ -62,10 +62,10 @@ class App extends Component {
           <h3 className="App-title">每次抽奖均保存在链上,无法修改,公开透明</h3>
         </header>
       <h4  >{this.state.lotterying?'正在抽奖...':(this.state.winner?'获胜者是'+this.state.winner:'')}</h4>
-      <Input placeholder="请输入要抽奖的人员,一次添加多人可以用空格键分隔" style={{width:500}} value={this.state.input} onChange={e=>this.setState({input:e.target.value})}></Input>
+      <Input placeholder="请输入要抽奖的人员,一次添加多人可以用空格键分隔" style={{width:575}} value={this.state.input} onChange={e=>this.setState({input:e.target.value})}></Input>
         <Button className="Button" onClick={this.handleAdd} >添加</Button>
         <Button className="Button" type="primary" onClick ={this.handleLottery}>开始抽奖</Button>   
-        <List  dataSource={this.state.data}  renderItem= { item =><List.Item actions={[<a onClick={ ()=> {
+        <List  style={{margin:10}} bordered  dataSource={this.state.data}  renderItem= { item =><List.Item actions={[<a onClick={ ()=> {
           this.state.data.delete(item);
           this.setState(this.state.data)}}>删除</a>]} > {item}</List.Item>}  ></List> 
       </div>
