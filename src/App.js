@@ -3,7 +3,7 @@ import { Button,Input,List } from 'antd';
 import './App.css';
 
 class App extends Component {
-  dappAddress = "n1ohace8tpgWGdd13uww3pHYczXR5zsV61m";
+  dappAddress = "n1xDpNu8mwsF8X4eEzS8LwBkMx4hZ3xBWtk";
   NebPay =require('nebpay');
   sha256 =require('js-sha256');
   nebPay =new this.NebPay();
@@ -25,14 +25,27 @@ class App extends Component {
     }
     this.setState({lotterying:true})
     console.log(JSON.stringify(Array.from(this.state.data)))
-    const serialNumber = this.nebPay.call(this.dappAddress, 0,  'save',JSON.stringify(Array.from(this.state.data)), {    //使用nebpay的call接口去调用合约,
-      listener: resp => console.log(resp)
-    });
+    var options = { 
+      //callback 是交易查询服务器地址,
+      callback:'https://pay.nebulas.io/api/mainnet/pay' //在主网查询(默认值)
+      // callback: NebPay.config.testnetUrl //在测试网查询
+      ,listener:res=> {
+        if(!res.txhash){
+         console.log('listener ======',res)
+         clearInterval(intervalQuery)
+         this.setState({lotterying:false,winner:''})
+        }
+      }
+  }
+  window.addEventListener('load', function() {
+     
+  }, false);
+    const serialNumber = this.nebPay.call(this.dappAddress, 0,  'save',JSON.stringify(Array.from(this.state.data)),options);
     console.log(serialNumber);
     const intervalQuery =setInterval(()=>{
         this.nebPay.queryPayInfo(serialNumber)
         .then( resp =>{
-          console.log("tx result: " + resp)   //resp is a JSON string
+              console.log("tx result: " + resp)   //resp is a JSON string
               const respObject = JSON.parse(resp)
               if (respObject.code !== 0) {
                 return ;
@@ -50,6 +63,7 @@ class App extends Component {
               alert('获胜者是' + winner)
               clearInterval(intervalQuery) 
         })
+        .catch(e =>console.log(e))
     },5000);
        
   }
@@ -67,7 +81,7 @@ class App extends Component {
         <Button className="Button" type="primary" onClick ={this.handleLottery}>开始抽奖</Button>   
         <List  style={{margin:10}} bordered  dataSource={this.state.data}  renderItem= { item =><List.Item actions={[<a onClick={ ()=> {
           this.state.data.delete(item);
-          this.setState(this.state.data)}}>删除</a>]} > {item}</List.Item>}  ></List> 
+          this.setState(this.state.data)}}>移除</a>]} > {item}</List.Item>}  ></List> 
       </div>
     );
   }
